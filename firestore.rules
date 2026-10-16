@@ -1,0 +1,38 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() { return request.auth != null; }
+    function activeAdmin() {
+      return signedIn()
+        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin'
+        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isLocked == false;
+    }
+    function validUser(data) {
+      return data.keys().hasAll(['displayName', 'email', 'role', 'isLocked', 'createdAt'])
+        && data.keys().hasOnly(['displayName', 'email', 'role', 'isLocked', 'createdAt'])
+        && data.displayName is string && data.displayName.size() > 0 && data.displayName.size() <= 80
+        && data.email is string && data.email.size() <= 254
+        && data.role in ['learner', 'tutor', 'admin']
+        && data.isLocked is bool && data.createdAt is timestamp;
+    }
+    match /users/{uid} {
+      // Chủ sở hữu vẫn đọc được trạng thái khóa để hiển thị màn hình phù hợp.
+      allow get: if signedIn() && (request.auth.uid == uid || activeAdmin());
+      allow list: if activeAdmin();
+      allow create: if signedIn() && request.auth.uid == uid
+        && validUser(request.resource.data)
+        && request.resource.data.role in ['learner', 'tutor']
+        && request.resource.data.isLocked == false
+        && request.resource.data.email == request.auth.token.email
+        && request.resource.data.createdAt == request.time;
+      allow update: if validUser(request.resource.data) && (
+        (signedIn() && request.auth.uid == uid && resource.data.isLocked == false
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['displayName']))
+        || (activeAdmin() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['isLocked']))
+      );
+      allow delete: if false;
+    }
+    // Các feature chưa triển khai đều đóng quyền truy cập.
+    match /{document=**} { allow read, write: if false; }
+  }
+}

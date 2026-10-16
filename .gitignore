@@ -1,0 +1,26 @@
+# SDK cục bộ và dependencies
+.tools/
+.dart_tool/
+.flutter-plugins*
+build/
+node_modules/
+.idea/
+*.iml
+.env
+!.env.example
+lib/firebase_options.dart
+**/google-services.json
+**/GoogleService-Info.plist
+**/*service-account*.json
+**/*serviceAccount*.json
+*.jks
+*.keystore
+android/key.properties
+android/local.properties
+android/.gradle/
+android/captures/
+firebase-debug.log*
+firestore-debug.log*
+ui-debug.log*
+.firebase/
+# pubspec.lock và package-lock.json phải được commit.
