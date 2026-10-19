@@ -9,6 +9,10 @@ import '../../features/auth/presentation/pages/auth_page.dart';
 import '../../features/auth/presentation/pages/session_page.dart';
 import '../../features/home/presentation/pages/home_page.dart';
 import 'route_guards.dart';
+import '../../features/tutor_profile/presentation/tutor_editor_page.dart';
+import '../../features/tutor_profile/presentation/tutor_detail_page.dart';
+import '../../features/tutor_profile/presentation/tutor_directory_page.dart';
+import '../../features/location/presentation/location_page.dart';
 
 final sessionProvider = Provider<Session>((ref) {
   final identity = ref.watch(identityProvider);
@@ -22,7 +26,7 @@ final sessionProvider = Provider<Session>((ref) {
   final account = profile.asData?.value;
   if (account == null) return const Session(SessionStatus.missingProfile);
   // Khóa ưu tiên hơn xác thực email và quyền truy cập theo vai trò.
-  if (account.isLocked) return const Session(SessionStatus.locked);
+  if (account.isLocked) return Session(SessionStatus.locked, account.role);
   if (!user.emailVerified) return const Session(SessionStatus.unverified);
   return Session(SessionStatus.ready, account.role);
 });
@@ -40,6 +44,22 @@ final routerProvider = Provider<GoRouter>((ref) {
     redirect: (_, state) =>
         routeRedirect(ref.read(sessionProvider), state.uri.path),
     routes: [
+      GoRoute(
+        path: '/tutor/profile',
+        builder: (_, _) => const TutorEditorPage(),
+      ),
+      GoRoute(path: '/tutors', builder: (_, _) => const TutorDirectoryPage()),
+      GoRoute(
+        path: '/tutors/:uid',
+        builder: (_, state) =>
+            TutorDetailPage(uid: state.pathParameters['uid']!),
+      ),
+      GoRoute(
+        path: '/location',
+        builder: (_, _) => LocationPage(
+          isTutor: ref.read(sessionProvider).role == UserRole.tutor,
+        ),
+      ),
       GoRoute(path: '/login', builder: (_, _) => const AuthPage()),
       GoRoute(
         path: '/register',

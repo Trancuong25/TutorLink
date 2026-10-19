@@ -1,4 +1,6 @@
-# TutorLink — Giai đoạn 1
+# TutorLink — Giai đoạn 1–2
+
+GĐ2: hồ sơ gia sư, vị trí riêng/công khai, thu hồi đồng ý và seed 150 gia sư đã được bổ sung. Xem [hướng dẫn GĐ2](docs/phase2.md) và [danh sách file thay đổi](docs/phase2-files.md). Các phần GĐ1 bên dưới được giữ làm hướng dẫn nền tảng.
 
 Nguyên mẫu Android nghiên cứu tìm gia sư theo vị trí và đa tiêu chí. GĐ1 có Material 3 tiếng Việt, Riverpod generator, go_router, Firebase Auth và hồ sơ phân quyền Firestore. **Không dùng Cloud Functions, custom claims hoặc Blaze.** Chưa triển khai GĐ2–GĐ6.
 

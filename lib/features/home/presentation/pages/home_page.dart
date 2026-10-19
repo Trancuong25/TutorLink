@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../core/errors/auth_error.dart';
 import '../../../auth/domain/entities/app_user.dart';
@@ -23,7 +24,7 @@ class HomePage extends ConsumerWidget {
       UserRole.tutor => (
         Icons.school_outlined,
         'Chia sẻ kiến thức của bạn',
-        'Hồ sơ gia sư, môn dạy và lịch rảnh sẽ có ở giai đoạn 2.',
+        'Cập nhật môn dạy, học phí, lịch rảnh và khu vực của bạn.',
       ),
       UserRole.admin => (
         Icons.admin_panel_settings_outlined,
@@ -65,6 +66,21 @@ class HomePage extends ConsumerWidget {
             child: Chip(label: Text(role.label)),
           ),
           const SizedBox(height: 28),
+          if (role == UserRole.tutor)
+            FilledButton(
+              onPressed: () => context.push('/tutor/profile'),
+              child: const Text('Tạo / sửa hồ sơ gia sư'),
+            ),
+          if (role == UserRole.learner) ...[
+            FilledButton(
+              onPressed: () => context.push('/tutors'),
+              child: const Text('Xem hồ sơ gia sư'),
+            ),
+            TextButton(
+              onPressed: () => context.push('/location'),
+              child: const Text('Chọn khu vực tìm kiếm'),
+            ),
+          ],
           Card(
             child: Padding(
               padding: const EdgeInsets.all(24),

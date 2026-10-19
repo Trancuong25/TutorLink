@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+
+import '../../domain/entities/app_user.dart';
 
 import '../../../../core/errors/auth_error.dart';
 import '../../../../core/widgets/status_page.dart';
@@ -35,6 +38,10 @@ class _SessionPageState extends ConsumerState<SessionPage> {
     final repo = ref.read(authRepositoryProvider);
     final verify = widget.path == '/verify-email';
     final locked = widget.path == '/locked';
+    final uid = ref.watch(identityProvider).asData?.value?.uid;
+    final role = uid == null
+        ? null
+        : ref.watch(profileProvider(uid)).asData?.value?.role;
     return StatusPage(
       title: verify
           ? 'Xác thực email'
@@ -50,6 +57,11 @@ class _SessionPageState extends ConsumerState<SessionPage> {
               : 'Kiểm tra kết nối mạng và thử tải lại.'),
       loading: _busy,
       actions: [
+        if (locked && role == UserRole.tutor)
+          TextButton(
+            onPressed: () => context.push('/location'),
+            child: const Text('Thu hồi chia sẻ vị trí'),
+          ),
         if (verify) ...[
           FilledButton(
             onPressed: _busy

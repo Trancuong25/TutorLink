@@ -32,6 +32,75 @@ service cloud.firestore {
       );
       allow delete: if false;
     }
+    function owner(uid) { return signedIn() && request.auth.uid == uid; }
+    function activeTutor(uid) {
+      return owner(uid) && get(/databases/$(database)/documents/users/$(uid)).data.role == 'tutor'
+        && get(/databases/$(database)/documents/users/$(uid)).data.isLocked == false;
+    }
+    function validTutor(d) {
+      return d.keys().hasAll(['displayName','bio','subjects','levels','hourlyRate','availability','teachingMode',
+          'isAvailable','approxLocation','geohash','ratingAvg','ratingCount','isMock','isHidden','updatedAt'])
+        && d.keys().hasOnly(['displayName','bio','subjects','levels','hourlyRate','availability','teachingMode',
+          'isAvailable','approxLocation','geohash','ratingAvg','ratingCount','isMock','isHidden','updatedAt'])
+        && d.displayName is string && d.displayName.size()>0 && d.displayName.size()<=80
+        && d.bio is string && d.bio.size()<=2000
+        && d.subjects is list && d.subjects.size()>0 && d.subjects.size()<=7
+        && d.subjects.hasOnly(['math','literature','english','physics','chemistry','biology','informatics'])
+        && d.subjects.toSet().size()==d.subjects.size()
+        && d.levels is list && d.levels.size()>0 && d.levels.size()<=5
+        && d.levels.hasOnly(['primary','secondary','high','university','other']) && d.levels.toSet().size()==d.levels.size()
+        && d.hourlyRate is int && d.hourlyRate>=50000 && d.hourlyRate<=1000000
+        && d.availability is list && d.availability.size()>0 && d.availability.size()<=21
+        && d.availability.hasOnly([0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20])
+        && d.availability.toSet().size()==d.availability.size()
+        && d.teachingMode in ['offline','online','both'] && d.isAvailable is bool
+        && ((d.approxLocation==null && d.geohash==null) || (d.approxLocation is latlng
+          && d.geohash is string && d.geohash.matches('^[0123456789bcdefghjkmnpqrstuvwxyz]{6}$')))
+        && d.ratingAvg is number && d.ratingAvg>=0 && d.ratingAvg<=5
+        && d.ratingCount is int && d.ratingCount>=0 && d.isMock is bool && d.isHidden is bool
+        && d.updatedAt==request.time;
+    }
+    function locationConsistent(uid,d) {
+      return (d.approxLocation==null && !existsAfter(/databases/$(database)/documents/private_locations/$(uid)))
+        || (d.approxLocation!=null && getAfter(/databases/$(database)/documents/private_locations/$(uid)).data.updatedAt==request.time
+          && d.approxLocation!=getAfter(/databases/$(database)/documents/private_locations/$(uid)).data.location);
+    }
+    match /tutors/{uid} {
+      allow read: if signedIn() && (resource.data.isHidden==false || owner(uid) || activeAdmin());
+      allow create: if activeTutor(uid) && validTutor(request.resource.data)
+        && request.resource.data.ratingAvg==0 && request.resource.data.ratingCount==0
+        && request.resource.data.isMock==false && request.resource.data.isHidden==false
+        && locationConsistent(uid,request.resource.data);
+      allow update: if validTutor(request.resource.data) && (
+        (activeTutor(uid) && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          'displayName','bio','subjects','levels','hourlyRate','availability','teachingMode',
+          'isAvailable','approxLocation','geohash','updatedAt'])
+          && (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['approxLocation','geohash'])
+            || locationConsistent(uid,request.resource.data)))
+        || (activeAdmin() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['isHidden','updatedAt']))
+        // Cho phép thu hồi cả khi bị khóa, không cho đổi trường khác.
+        || (owner(uid) && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['approxLocation','geohash','updatedAt'])
+          && request.resource.data.approxLocation==null && request.resource.data.geohash==null
+          && !existsAfter(/databases/$(database)/documents/private_locations/$(uid)))
+      );
+      allow delete: if false;
+    }
+    match /private_locations/{uid} {
+      allow read: if owner(uid);
+      allow create, update: if activeTutor(uid)
+        && request.resource.data.keys().hasAll(['location','source','consentVersion','updatedAt'])
+        && request.resource.data.keys().hasOnly(['location','source','consentVersion','updatedAt'])
+        && request.resource.data.location is latlng
+        && request.resource.data.location.latitude()>=-60 && request.resource.data.location.latitude()<=60
+        && request.resource.data.source in ['gps','manual'] && request.resource.data.consentVersion=='location-v1'
+        && request.resource.data.updatedAt==request.time
+        && getAfter(/databases/$(database)/documents/tutors/$(uid)).data.updatedAt==request.time
+        && getAfter(/databases/$(database)/documents/tutors/$(uid)).data.approxLocation is latlng
+        && getAfter(/databases/$(database)/documents/tutors/$(uid)).data.approxLocation!=request.resource.data.location;
+      allow delete: if owner(uid)
+        && getAfter(/databases/$(database)/documents/tutors/$(uid)).data.approxLocation==null
+        && getAfter(/databases/$(database)/documents/tutors/$(uid)).data.geohash==null;
+    }
     // Các feature chưa triển khai đều đóng quyền truy cập.
     match /{document=**} { allow read, write: if false; }
   }

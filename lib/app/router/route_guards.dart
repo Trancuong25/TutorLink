@@ -18,6 +18,11 @@ class Session {
 
 String homePath(UserRole role) => '/${role.name}';
 String? routeRedirect(Session session, String location) {
+  if (session.status == SessionStatus.locked &&
+      session.role == UserRole.tutor &&
+      location == '/location') {
+    return null;
+  }
   final target = switch (session.status) {
     SessionStatus.loading => '/loading',
     SessionStatus.signedOut => '/login',
@@ -31,6 +36,15 @@ String? routeRedirect(Session session, String location) {
       ['/login', '/register', '/forgot-password'].contains(location)) {
     return null;
   }
-  // GĐ1 mỗi vai trò có một trang chủ; deep link sai vai trò bị chuyển về trang đúng.
+  if (session.status == SessionStatus.ready) {
+    if (location == '/tutors' ||
+        RegExp(r'^/tutors/[^/]+$').hasMatch(location)) {
+      return null;
+    }
+    if (location == '/tutor/profile' && session.role == UserRole.tutor) {
+      return null;
+    }
+    if (location == '/location' && session.role != UserRole.admin) return null;
+  }
   return location == target ? null : target;
 }
