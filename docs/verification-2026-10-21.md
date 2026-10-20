@@ -34,3 +34,16 @@
 - 11 kiểm tra production bằng client Firebase SDK: chặn tự nâng quyền; chặn sửa isLocked; tạo hồ sơ tutor; chặn learner sửa tutor; chặn sửa rating; lưu batch private/public; đối chiếu khoảng cách 200–500 m; owner đọc private; learner bị chặn đọc private; learner đọc public; thu hồi xóa private và đặt public location null.
 - Dùng hai Auth user tạm riêng biệt, không sửa dữ liệu tài khoản người dùng cho bộ kiểm tra production; cả hai Auth user và tài liệu thử đã được xóa trong bước cleanup.
 - Các lỗi PERMISSION_DENIED ở những ca kiểm tra bị chặn là kết quả mong đợi.
+- Sau sửa giao diện: analyze sạch, 29/29 Flutter test đạt, build APK debug thành công.
+- Cài đè APK mới lên Note9 thành công; mở lại giữ đúng phiên Gia sư và không còn dòng “Chưa có dữ liệu”.
+- Đã push mã nguồn lên repository riêng tư https://github.com/Trancuong25/TutorLink (nhánh master).
+- API key, google-services.json, firebase_options.dart, .env và các script vận hành OAuth tạm trong .tools không được đưa lên Git.
+
+## File thay đổi trong đợt hoàn thiện
+
+- `.gitignore`: bỏ qua cache Kotlin.
+- `android/gradle.properties`: giữ tùy chọn `kotlin.incremental=false` do người dùng thêm.
+- `firebase.json`: giữ metadata FlutterFire do người dùng cấu hình cho project thật.
+- `lib/features/home/presentation/pages/home_page.dart`: bỏ thông báo thiếu dữ liệu cố định.
+- `test/features/home/home_page_test.dart`: cập nhật kỳ vọng giao diện.
+- `README.md`, `docs/phase2.md`, `docs/verification-2026-10-21.md`: cập nhật trạng thái triển khai và bằng chứng kiểm thử.

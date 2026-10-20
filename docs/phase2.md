@@ -1,5 +1,7 @@
 # GĐ2 — Hồ sơ gia sư và vị trí
 
+**Cập nhật 21/10/2026:** đã deploy Rules/index và seed 150 gia sư trên Firebase thật; 11 kiểm tra production đạt. Các kết quả ngày 19/10 bên dưới là lịch sử trước triển khai. Xem [báo cáo mới nhất](verification-2026-10-21.md).
+
 GĐ1 được giữ nguyên; thêm route và nút mở feature, quyền Android, Rules/index và geolocator 14.1.1. Không có Cloud Functions, không yêu cầu Blaze. Đây là Flutter thuần; không khởi tạo hoặc đồng bộ một dự án FlutterFlow khác.
 
 ## Cách dùng
