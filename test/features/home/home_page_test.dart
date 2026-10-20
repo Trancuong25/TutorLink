@@ -7,7 +7,7 @@ import 'package:tutorlink/features/home/presentation/pages/home_page.dart';
 
 void main() {
   for (final role in UserRole.values) {
-    testWidgets('trang chủ ${role.name} có empty state', (tester) async {
+    testWidgets('trang chủ ${role.name} không báo thiếu dữ liệu giả', (tester) async {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
@@ -18,7 +18,7 @@ void main() {
       );
       await tester.pumpAndSettle();
       expect(find.text(role.label), findsOneWidget);
-      expect(find.text('Chưa có dữ liệu'), findsOneWidget);
+      expect(find.text('Chưa có dữ liệu'), findsNothing);
     });
   }
 }

@@ -1,9 +1,1 @@
-{
-  "firestore": { "rules": "firestore.rules", "indexes": "firestore.indexes.json" },
-  "emulators": {
-    "auth": { "port": 9099 },
-    "firestore": { "port": 8080 },
-    "ui": { "enabled": true, "port": 4000 },
-    "singleProjectMode": true
-  }
-}
+{"firestore":{"rules":"firestore.rules","indexes":"firestore.indexes.json"},"emulators":{"auth":{"port":9099},"firestore":{"port":8080},"ui":{"enabled":true,"port":4000},"singleProjectMode":true},"flutter":{"platforms":{"android":{"default":{"projectId":"tutorlink-a4ef5","appId":"1:646800382041:android:52a6c59325e51da74b7948","fileOutput":"android/app/google-services.json"}},"dart":{"lib/firebase_options.dart":{"projectId":"tutorlink-a4ef5","configurations":{"android":"1:646800382041:android:52a6c59325e51da74b7948"}}}}}}

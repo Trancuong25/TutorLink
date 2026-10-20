@@ -126,7 +126,17 @@ Kiểm thử thủ công bổ sung: đăng ký từng vai trò, mở liên kết
 
 Chưa đo SLA tìm kiếm <2 giây: tính năng tìm kiếm thuộc GĐ3. Không coi widget test hoặc Rules tests là bằng chứng chạy APK trên thiết bị.
 
-## Phạm vi tiếp theo
+## Trạng thái triển khai GĐ2 (21/10/2026)
+
+- Firebase thật: `tutorlink-a4ef5`, Firestore Standard tại Singapore, Spark.
+- Rules và hai composite index đã được triển khai.
+- Đã nạp và đếm đủ 150 gia sư `isMock=true` cùng 150 vị trí riêng tư mẫu.
+- 11 kiểm tra production bằng hai tài khoản tạm đã đạt; tài khoản và tài liệu thử đã được dọn sạch.
+- Đã thử trên Samsung Note9: khởi động, giữ phiên đăng nhập, lưu/xem hồ sơ, kiểm tra form vị trí, lưu tâm khu vực và thu hồi.
+- Xem [báo cáo kiểm thử](docs/verification-2026-10-21.md) và [hướng dẫn GĐ2](docs/phase2.md).
+- GPS thật, mất mạng và quyền GPS bị từ chối vĩnh viễn vẫn cần nghiệm thu riêng; chưa triển khai GĐ3.
+
+## Lịch sử GĐ1 và phạm vi tiếp theo
 
 Kết quả kiểm tra GĐ1 ngày 16/10/2026:
 

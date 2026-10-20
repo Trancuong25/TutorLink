@@ -18,6 +18,7 @@ lib/firebase_options.dart
 android/key.properties
 android/local.properties
 android/.gradle/
+android/.kotlin/
 android/captures/
 firebase-debug.log*
 firestore-debug.log*

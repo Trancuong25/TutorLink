@@ -99,11 +99,6 @@ class HomePage extends ConsumerWidget {
                   ),
                   const SizedBox(height: 12),
                   Text(description, textAlign: TextAlign.center),
-                  const SizedBox(height: 16),
-                  const Text(
-                    'Chưa có dữ liệu',
-                    style: TextStyle(color: Colors.grey),
-                  ),
                 ],
               ),
             ),
