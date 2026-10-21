@@ -14,21 +14,22 @@
 
 ## Đang làm / chưa kiểm thử
 
-- Phiên này chỉ thêm luật dự án và quy trình bàn giao, không thay đổi tính năng.
-- APK đã build ở trước review; CHƯA chứa sửa review. Chưa build/cài lại và chưa kiểm thử GĐ3–GĐ4 trên điện thoại. Không dùng kết quả thiết bị GĐ2 để suy ra phiên bản mới đã chạy.
+- Phiên hiện tại chuẩn bị kiểm nghiệm thiết bị, không thay đổi tính năng. Xem [phiếu kiểm nghiệm](device-verification.md).
+- APK mới chứa sửa review đã build và cài thành công lên Note9 Android 10 bằng cập nhật giữ dữ liệu. MainActivity khởi động thành công. Các luồng đăng ký, tìm kiếm, bản đồ/GPS và xếp hạng vẫn chờ xác nhận trên điện thoại; không coi khởi động là đạt toàn bộ.
+- Người dùng cho biết chưa có tài khoản để thử; đã hướng dẫn đăng ký Người học và xác thực email trong app. Không yêu cầu gửi thông tin đăng nhập.
 - GĐ5–GĐ6 chưa triển khai; FCM/thông báo chưa có. Chưa chọn phương án gửi thông báo cho GĐ5 trong giới hạn Spark.
 
 ## Việc tiếp theo
 
 1. Khi tiếp quản: đọc luật, git status/log/diff, chạy scripts\check.bat; không chạy hai công cụ sửa cùng checkout.
-2. Khi người dùng yêu cầu: build/cài APK mới, kiểm thử tìm kiếm, bản đồ/GPS và hai chế độ trên điện thoại.
+2. Tiếp tục hướng dẫn đăng ký/xác thực Người học; kiểm thử tìm kiếm, bản đồ/GPS và hai chế độ trên điện thoại, ghi kết quả vào phiếu kiểm nghiệm.
 3. Chờ cho phép bắt đầu GĐ5: yêu cầu học, thông báo, đánh giá và báo cáo vi phạm; chốt cách thông báo, cập nhật C và quyền dữ liệu trước khi triển khai.
 
 ## Kiểm tra gần nhất
 
 - Bản review efebd6b: Flutter analyze + Dart analyze sạch; Flutter test 38/38, ranking 13/13, Emulator 31/31 đạt.
 - scripts\check.bat chạy thành công lúc khoảng 21:20 (Asia/Saigon), 21/10/2026, exit code 0: Flutter/Dart analyze sạch; Flutter 38/38, ranking 13/13, Emulator 31/31 đạt. Emulator đã dừng sau test.
-- Không có thay đổi code ứng dụng trong phiên bàn giao này.
+- Không có thay đổi code ứng dụng trong phiên kiểm nghiệm thiết bị. Kết quả check chạy lại trong phiên này ghi ở phiếu kiểm nghiệm.
 
 ## Rủi ro/giới hạn đã biết
 
