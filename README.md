@@ -1,10 +1,12 @@
-# TutorLink — Giai đoạn 1–3
+# TutorLink — Giai đoạn 1–4
+
+GĐ4: [công thức xếp hạng, chuẩn hóa trọng số và cách cập nhật AHP](docs/phase4.md). [Báo cáo kiểm thử và giới hạn GĐ3–GĐ4](docs/verification-phase3-4.md). Tài khoản **Người học** mở **Tìm gia sư gần bạn**, chọn vị trí và bộ lọc rồi chuyển Gần nhất/Phù hợp nhất.
 
 GĐ3: [tìm kiếm danh sách/bản đồ, bộ lọc và giới hạn truy vấn](docs/phase3.md). Dùng flutter_map/OpenStreetMap thay Google Maps để không bật billing. Cấu hình tile URL/User-Agent trong `.env` theo `.env.example`; có cache đĩa và attribution. Xem hướng dẫn về giới hạn tile công cộng trước demo.
 
 GĐ2: hồ sơ gia sư, vị trí riêng/công khai, thu hồi đồng ý và seed 150 gia sư đã được bổ sung. Xem [hướng dẫn GĐ2](docs/phase2.md) và [danh sách file thay đổi](docs/phase2-files.md). Các phần GĐ1 bên dưới được giữ làm hướng dẫn nền tảng.
 
-Nguyên mẫu Android nghiên cứu tìm gia sư theo vị trí và đa tiêu chí. GĐ1 có Material 3 tiếng Việt, Riverpod generator, go_router, Firebase Auth và hồ sơ phân quyền Firestore. **Không dùng Cloud Functions, custom claims hoặc Blaze.** Chưa triển khai GĐ4–GĐ6.
+Nguyên mẫu Android nghiên cứu tìm gia sư theo vị trí và đa tiêu chí. GĐ1 có Material 3 tiếng Việt, Riverpod generator, go_router, Firebase Auth và hồ sơ phân quyền Firestore. **Không dùng Cloud Functions, custom claims hoặc Blaze.** Chưa triển khai GĐ5–GĐ6.
 
 ## Công cụ và cấu trúc
 
@@ -126,7 +128,7 @@ flutter test integration_test/auth_smoke_test.dart -d <android-device-id> --dart
 
 Kiểm thử thủ công bổ sung: đăng ký từng vai trò, mở liên kết xác thực từ emulator, đăng xuất/đăng nhập, quên mật khẩu, thử mất mạng khi hoàn tất hồ sơ, đổi isLocked bằng emulator/admin và quan sát điều hướng.
 
-Chưa đo SLA tìm kiếm <2 giây: tính năng tìm kiếm thuộc GĐ3. Không coi widget test hoặc Rules tests là bằng chứng chạy APK trên thiết bị.
+Đã đo truy vấn tìm kiếm từ máy tính tới Firebase thật dưới 2 giây trong 12 lần thử; xem báo cáo GĐ3–GĐ4. Chưa xác nhận SLA trên Android/mạng di động. Không coi widget test hoặc Rules tests là bằng chứng chạy APK trên thiết bị.
 
 ## Trạng thái triển khai GĐ2 (21/10/2026)
 

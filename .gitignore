@@ -1,6 +1,7 @@
 # SDK cục bộ và dependencies
 .tools/
 .dart_tool/
+**/.dart_tool/
 .flutter-plugins*
 build/
 node_modules/

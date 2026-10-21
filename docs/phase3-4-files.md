@@ -1,0 +1,42 @@
+# Danh sách file thay đổi GĐ3–GĐ4
+
+So với commit GĐ2 `6d2c9df`. Không gồm file cấu hình bí mật, SDK, dữ liệu thử tạm và APK.
+
+- `.env.example`
+- `.gitignore`
+- `config/ranking_defaults.json`
+- `docs/phase3-4-files.md`
+- `docs/phase3.md`
+- `docs/phase4.md`
+- `docs/verification-phase3-4.md`
+- `firebase/tests/ranking.rules.test.js`
+- `firebase/tests/seed.test.js`
+- `firestore.indexes.json`
+- `firestore.rules`
+- `lib/app/router/app_router.dart`
+- `lib/app/router/route_guards.dart`
+- `lib/features/home/presentation/pages/home_page.dart`
+- `lib/features/search/data/firestore_search_repository.dart`
+- `lib/features/search/domain/geo_query.dart`
+- `lib/features/search/domain/ranking_config.dart`
+- `lib/features/search/domain/search_models.dart`
+- `lib/features/search/presentation/maps/tutor_map.dart`
+- `lib/features/search/presentation/ranked_results.dart`
+- `lib/features/search/presentation/ranking_providers.dart`
+- `lib/features/search/presentation/search_filters_sheet.dart`
+- `lib/features/search/presentation/search_page.dart`
+- `lib/features/search/presentation/search_providers.dart`
+- `lib/features/search/presentation/tutor_search_card.dart`
+- `lib/features/tutor_profile/data/firestore_tutor_repository.dart`
+- `packages/tutor_ranking/analysis_options.yaml`
+- `packages/tutor_ranking/lib/tutor_ranking.dart`
+- `packages/tutor_ranking/pubspec.lock`
+- `packages/tutor_ranking/pubspec.yaml`
+- `packages/tutor_ranking/test/ranking_test.dart`
+- `pubspec.lock`
+- `pubspec.yaml`
+- `README.md`
+- `scripts/seed/seed.js`
+- `test/features/search/ranking_ui_test.dart`
+- `test/features/search/search_domain_test.dart`
+- `test/features/search/search_page_test.dart`

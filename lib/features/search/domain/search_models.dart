@@ -26,7 +26,7 @@ class SearchRequest {
         tutor.isAvailable &&
         p != null &&
         tutor.subjects.contains(subject) &&
-        distanceMeters(center, p) <= radiusKm * 1000 + 0.001 &&
+        distanceMeters(center, p) / 1000 <= radiusKm &&
         (!requireLevel || level == null || tutor.levels.contains(level)) &&
         (!requireBudget || budget == null || tutor.hourlyRate <= budget!) &&
         (!requireSchedule ||

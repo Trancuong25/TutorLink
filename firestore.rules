@@ -101,6 +101,23 @@ service cloud.firestore {
         && getAfter(/databases/$(database)/documents/tutors/$(uid)).data.approxLocation==null
         && getAfter(/databases/$(database)/documents/tutors/$(uid)).data.geohash==null;
     }
+    function validWeights(d) {
+      return d.keys().hasAll(['subject','schedule','distance','price','rating','systemRatingMean'])
+        && d.keys().hasOnly(['subject','schedule','distance','price','rating','systemRatingMean'])
+        && d.subject is number && d.subject>=0 && d.subject<=1
+        && d.schedule is number && d.schedule>=0 && d.schedule<=1
+        && d.distance is number && d.distance>=0 && d.distance<=1
+        && d.price is number && d.price>=0 && d.price<=1
+        && d.rating is number && d.rating>=0 && d.rating<=1
+        && d.subject+d.schedule+d.distance+d.price+d.rating>=0.999999
+        && d.subject+d.schedule+d.distance+d.price+d.rating<=1.000001
+        && d.systemRatingMean is number && d.systemRatingMean>=0 && d.systemRatingMean<=5;
+    }
+    match /config/ranking_weights {
+      allow get: if signedIn();
+      allow create, update: if activeAdmin() && validWeights(request.resource.data);
+      allow delete: if false;
+    }
     // Các feature chưa triển khai đều đóng quyền truy cập.
     match /{document=**} { allow read, write: if false; }
   }

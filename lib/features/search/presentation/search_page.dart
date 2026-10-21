@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:tutor_ranking/tutor_ranking.dart';
 
 import '../../../core/constants/tutor_catalog.dart' as catalog;
 import '../../location/presentation/location_providers.dart';
 import '../domain/search_models.dart';
-import 'maps/tutor_map.dart';
+import 'ranked_results.dart';
+import 'ranking_providers.dart';
 import 'search_filters_sheet.dart';
 import 'search_providers.dart';
-import 'tutor_search_card.dart';
 
 class SearchPage extends ConsumerStatefulWidget {
   const SearchPage({super.key});
@@ -23,6 +24,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
     final location = ref.watch(searchLocationProvider);
     final filters = ref.watch(searchFiltersProvider);
     final results = ref.watch(searchResultsProvider);
+    final rankingMode = ref.watch(rankingModeProvider);
     return Scaffold(
       appBar: AppBar(
         title: const Text('Tìm gia sư'),
@@ -74,6 +76,21 @@ class _SearchPageState extends ConsumerState<SearchPage> {
             onSelectionChanged: (v) => setState(() => map = v.first),
           ),
           const SizedBox(height: 8),
+          SegmentedButton<RankingMode>(
+            segments: const [
+              ButtonSegment(
+                value: RankingMode.nearest,
+                label: Text('Gần nhất'),
+              ),
+              ButtonSegment(
+                value: RankingMode.bestMatch,
+                label: Text('Phù hợp nhất'),
+              ),
+            ],
+            selected: {rankingMode},
+            onSelectionChanged: (v) =>
+                ref.read(rankingModeProvider.notifier).select(v.first),
+          ),
           if (map)
             const Padding(
               padding: EdgeInsets.symmetric(horizontal: 12),
@@ -108,39 +125,11 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                         ],
                       ),
                     ),
-                    data: (result) => Column(
-                      children: [
-                        Text(
-                          '${result.hits.length} gia sư · ${result.elapsed.inMilliseconds} ms',
-                        ),
-                        if (result.truncated)
-                          const Text(
-                            'Đã giới hạn 100 kết quả; hãy thu hẹp khu vực/bộ lọc.',
-                          ),
-                        if (result.hits.isEmpty)
-                          const Padding(
-                            padding: EdgeInsets.all(12),
-                            child: Text(
-                              'Không tìm thấy gia sư. Hãy tăng bán kính hoặc bớt bộ lọc.',
-                            ),
-                          ),
-                        Expanded(
-                          child: map
-                              ? TutorMap(
-                                  key: ValueKey(
-                                    '${location.point.latitude}/${location.point.longitude}',
-                                  ),
-                                  center: location.point,
-                                  radiusKm: filters.radiusKm,
-                                  hits: result.hits,
-                                )
-                              : ListView.builder(
-                                  itemCount: result.hits.length,
-                                  itemBuilder: (_, i) =>
-                                      TutorSearchCard(hit: result.hits[i]),
-                                ),
-                        ),
-                      ],
+                    data: (result) => RankedResults(
+                      result: result,
+                      request: filters,
+                      center: location.point,
+                      map: map,
                     ),
                   ),
           ),

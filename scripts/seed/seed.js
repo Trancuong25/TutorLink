@@ -56,7 +56,30 @@ async function seed(db) {
       location:new GeoPoint(r.exact.lat,r.exact.lon),source:'manual',
       consentVersion:'mock-only',isMock:true,updatedAt:FieldValue.serverTimestamp()});
   }
-  await batch.commit(); return statistics(rows);
+  await batch.commit();
+  await ensureRankingConfig(db);
+  return statistics(rows);
+}
+async function ensureRankingConfig(db) {
+  const ref=db.doc('config/ranking_weights');
+  if((await ref.get()).exists)return {created:false};
+  const defaults=JSON.parse(fs.readFileSync(path.resolve(__dirname,'../../config/ranking_defaults.json'),'utf8'));
+  // C là trung bình có trọng số theo số lượt của toàn bộ hồ sơ đã có đánh giá.
+  const tutors=await db.collection('tutors').get();
+  let sum=0,count=0;
+  for(const doc of tutors.docs){
+    const d=doc.data();
+    if(Number.isInteger(d.ratingCount)&&d.ratingCount>0&&Number.isFinite(d.ratingAvg)&&d.ratingAvg>=0&&d.ratingAvg<=5){
+      sum+=d.ratingAvg*d.ratingCount;count+=d.ratingCount;
+    }
+  }
+  if(count)defaults.systemRatingMean=sum/count;
+  // Không ghi đè trọng số khảo sát/AHP đã được quản trị điều chỉnh.
+  const created=await db.runTransaction(async tx=>{
+    if((await tx.get(ref)).exists)return false;
+    tx.create(ref,defaults);return true;
+  });
+  return {created};
 }
 async function clean(db) {
   let removed=0;
@@ -73,6 +96,7 @@ async function clean(db) {
 async function main() {
   const {values}=parseArgs({options:{
     emulator:{type:'boolean',default:false},project:{type:'string'},clean:{type:'boolean',default:false},
+    'config-only':{type:'boolean',default:false},
   },strict:true});
   let options;
   if(values.emulator) {
@@ -92,8 +116,9 @@ async function main() {
   const app=initializeApp(options);
   try {
     console.log('Project: '+options.projectId+(values.emulator?' (EMULATOR)':' (THẬT)'));
-    console.log(JSON.stringify(await (values.clean?clean(getFirestore(app)):seed(getFirestore(app))),null,2));
+    if(values.clean&&values['config-only'])throw Error('Không kết hợp --clean và --config-only.');
+    console.log(JSON.stringify(await (values.clean?clean(getFirestore(app)):values['config-only']?ensureRankingConfig(getFirestore(app)):seed(getFirestore(app))),null,2));
   } finally {await deleteApp(app);}
 }
 if(require.main===module)main().catch(e=>{console.error(e.message);process.exitCode=1;});
-module.exports={generate,statistics,seed,clean};
+module.exports={generate,statistics,seed,clean,ensureRankingConfig};

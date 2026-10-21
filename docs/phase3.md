@@ -26,3 +26,5 @@ Mục tiêu <2 giây cần đo trên mạng/thiết bị thực tế; không coi
 ## Kiểm tra trước commit GĐ3
 
 Ngày 21/10/2026: analyze source/test/integration_test không có cảnh báo, 35/35 Flutter test đạt. Index mới deploy thành công; tại lần đo đầu index còn BUILDING nên chưa có kết quả latency. Điện thoại không kết nối ADB ở thời điểm này; chưa xác nhận bản đồ trên máy thật. Tiếp tục đo và build trong đợt GĐ4.
+
+Cập nhật trong GĐ4: index đã sẵn sàng, 12 lần đo từ máy tính tới Firebase thật đạt 294–1488 ms, số kết quả Toán tăng 3/24/34/47 theo R 1/2/5/10 km. Xem [báo cáo đầy đủ](verification-phase3-4.md).

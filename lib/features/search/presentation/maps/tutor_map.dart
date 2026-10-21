@@ -15,10 +15,12 @@ class TutorMap extends StatefulWidget {
     required this.center,
     required this.radiusKm,
     required this.hits,
+    this.explanationBuilder,
   });
   final LocationPoint center;
   final double radiusKm;
   final List<SearchHit> hits;
+  final Widget? Function(SearchHit)? explanationBuilder;
   @override
   State<TutorMap> createState() => _TutorMapState();
 }
@@ -119,7 +121,12 @@ class _TutorMapState extends State<TutorMap> {
                             context: context,
                             builder: (_) => SafeArea(
                               child: SingleChildScrollView(
-                                child: TutorSearchCard(hit: h),
+                                child: TutorSearchCard(
+                                  hit: h,
+                                  explanation: widget.explanationBuilder?.call(
+                                    h,
+                                  ),
+                                ),
                               ),
                             ),
                           ),
