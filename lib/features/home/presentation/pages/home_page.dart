@@ -19,7 +19,7 @@ class HomePage extends ConsumerWidget {
       UserRole.learner => (
         Icons.search,
         'Tìm người đồng hành học tập',
-        'Danh sách gia sư và tìm kiếm theo vị trí sẽ có ở giai đoạn 3.',
+        'Chọn môn học, khu vực và lịch mong muốn để tìm gia sư.',
       ),
       UserRole.tutor => (
         Icons.school_outlined,
@@ -72,6 +72,10 @@ class HomePage extends ConsumerWidget {
               child: const Text('Tạo / sửa hồ sơ gia sư'),
             ),
           if (role == UserRole.learner) ...[
+            FilledButton(
+              onPressed: () => context.push('/search'),
+              child: const Text('Tìm gia sư gần bạn'),
+            ),
             FilledButton(
               onPressed: () => context.push('/tutors'),
               child: const Text('Xem hồ sơ gia sư'),

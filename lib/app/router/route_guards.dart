@@ -37,6 +37,7 @@ String? routeRedirect(Session session, String location) {
     return null;
   }
   if (session.status == SessionStatus.ready) {
+    if (location == '/search' && session.role == UserRole.learner) return null;
     if (location == '/tutors' ||
         RegExp(r'^/tutors/[^/]+$').hasMatch(location)) {
       return null;

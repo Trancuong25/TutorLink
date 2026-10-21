@@ -13,6 +13,7 @@ import '../../features/tutor_profile/presentation/tutor_editor_page.dart';
 import '../../features/tutor_profile/presentation/tutor_detail_page.dart';
 import '../../features/tutor_profile/presentation/tutor_directory_page.dart';
 import '../../features/location/presentation/location_page.dart';
+import '../../features/search/presentation/search_page.dart';
 
 final sessionProvider = Provider<Session>((ref) {
   final identity = ref.watch(identityProvider);
@@ -44,6 +45,7 @@ final routerProvider = Provider<GoRouter>((ref) {
     redirect: (_, state) =>
         routeRedirect(ref.read(sessionProvider), state.uri.path),
     routes: [
+      GoRoute(path: '/search', builder: (_, _) => const SearchPage()),
       GoRoute(
         path: '/tutor/profile',
         builder: (_, _) => const TutorEditorPage(),

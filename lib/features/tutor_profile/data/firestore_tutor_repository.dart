@@ -8,7 +8,7 @@ import '../../location/domain/location_privacy.dart';
 class FirestoreTutorRepository implements TutorRepository {
   FirestoreTutorRepository(this.db);
   final FirebaseFirestore db;
-  TutorProfile _decode(DocumentSnapshot<Map<String, dynamic>> doc) {
+  static TutorProfile decode(DocumentSnapshot<Map<String, dynamic>> doc) {
     final d = doc.data()!;
     final p = d['approxLocation'] as GeoPoint?;
     return TutorProfile(
@@ -35,7 +35,7 @@ class FirestoreTutorRepository implements TutorRepository {
       .collection('tutors')
       .doc(uid)
       .snapshots()
-      .map((doc) => doc.exists ? _decode(doc) : null);
+      .map((doc) => doc.exists ? decode(doc) : null);
   @override
   Future<List<TutorProfile>> list() async {
     final snapshot = await db
@@ -43,7 +43,7 @@ class FirestoreTutorRepository implements TutorRepository {
         .where('isHidden', isEqualTo: false)
         .limit(150)
         .get();
-    return snapshot.docs.map(_decode).toList();
+    return snapshot.docs.map(decode).toList();
   }
 
   @override

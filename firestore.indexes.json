@@ -3,6 +3,12 @@
     { "collectionGroup": "tutors", "queryScope": "COLLECTION", "fields": [
       { "fieldPath": "isHidden", "order": "ASCENDING" },
       { "fieldPath": "isAvailable", "order": "ASCENDING" },
+      { "fieldPath": "subjects", "arrayConfig": "CONTAINS" },
+      { "fieldPath": "geohash", "order": "ASCENDING" }
+    ] },
+    { "collectionGroup": "tutors", "queryScope": "COLLECTION", "fields": [
+      { "fieldPath": "isHidden", "order": "ASCENDING" },
+      { "fieldPath": "isAvailable", "order": "ASCENDING" },
       { "fieldPath": "geohash", "order": "ASCENDING" }
     ] },
     { "collectionGroup": "tutors", "queryScope": "COLLECTION", "fields": [

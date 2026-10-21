@@ -1,8 +1,10 @@
-# TutorLink — Giai đoạn 1–2
+# TutorLink — Giai đoạn 1–3
+
+GĐ3: [tìm kiếm danh sách/bản đồ, bộ lọc và giới hạn truy vấn](docs/phase3.md). Dùng flutter_map/OpenStreetMap thay Google Maps để không bật billing. Cấu hình tile URL/User-Agent trong `.env` theo `.env.example`; có cache đĩa và attribution. Xem hướng dẫn về giới hạn tile công cộng trước demo.
 
 GĐ2: hồ sơ gia sư, vị trí riêng/công khai, thu hồi đồng ý và seed 150 gia sư đã được bổ sung. Xem [hướng dẫn GĐ2](docs/phase2.md) và [danh sách file thay đổi](docs/phase2-files.md). Các phần GĐ1 bên dưới được giữ làm hướng dẫn nền tảng.
 
-Nguyên mẫu Android nghiên cứu tìm gia sư theo vị trí và đa tiêu chí. GĐ1 có Material 3 tiếng Việt, Riverpod generator, go_router, Firebase Auth và hồ sơ phân quyền Firestore. **Không dùng Cloud Functions, custom claims hoặc Blaze.** Chưa triển khai GĐ3–GĐ6.
+Nguyên mẫu Android nghiên cứu tìm gia sư theo vị trí và đa tiêu chí. GĐ1 có Material 3 tiếng Việt, Riverpod generator, go_router, Firebase Auth và hồ sơ phân quyền Firestore. **Không dùng Cloud Functions, custom claims hoặc Blaze.** Chưa triển khai GĐ4–GĐ6.
 
 ## Công cụ và cấu trúc
 
