@@ -8,6 +8,12 @@ GĐ2: hồ sơ gia sư, vị trí riêng/công khai, thu hồi đồng ý và se
 
 Nguyên mẫu Android nghiên cứu tìm gia sư theo vị trí và đa tiêu chí. GĐ1 có Material 3 tiếng Việt, Riverpod generator, go_router, Firebase Auth và hồ sơ phân quyền Firestore. **Không dùng Cloud Functions, custom claims hoặc Blaze.** Chưa triển khai GĐ5–GĐ6.
 
+## Điều chỉnh xếp hạng sau review
+
+Điểm lịch = |slots gia sư ∩ slots người học cần| / |slots người học cần|. Chỉ tính khi người học chọn lịch; nếu bỏ trống thì bỏ tiêu chí và chuẩn hóa lại trọng số. Dùng độ phủ thay Jaccard vì Jaccard phạt gia sư rảnh nhiều buổi ngoài nhu cầu. Lý do “Trùng k/n buổi” dùng đúng tử/mẫu của điểm lịch.
+
+Không chọn cấp học: subject = 1. `rankTutors` trả `RankingResult` gồm `rankedTutors` và `skippedUids` (hồ sơ lỗi giá/lịch/tọa độ/đánh giá); UI ghi log UID bị bỏ qua. Request hoặc trọng số sai vẫn bị từ chối.
+
 ## Công cụ và cấu trúc
 
 Flutter stable 3.47.7 / Dart 3.13.5. Dependency trực tiếp ghim trong pubspec.yaml và package.json; commit cả pubspec.lock và package-lock.json. Node 24, JDK 21 trở lên cho Firebase Emulator. Flutter cài cục bộ trong .tools/flutter bị loại khỏi Git.

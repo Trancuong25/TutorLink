@@ -11,6 +11,7 @@ RankingWeights weights() => RankingWeights({
 TutorCandidate candidate({
   String uid = 't',
   double lon = 0,
+  double lat = 0,
   Set<int> slots = const {0, 1},
   Set<String> levels = const {'high'},
   Set<String> subjects = const {'math'},
@@ -23,7 +24,7 @@ TutorCandidate candidate({
   subjects: subjects,
   levels: levels,
   slots: slots,
-  position: Position(0, lon),
+  position: Position(lat, lon),
   hourlyRate: price,
   ratingAvg: average,
   ratingCount: count,
@@ -38,11 +39,88 @@ const request = RankingRequest(
   slots: {0, 1},
 );
 void main() {
-  test('Jaccard giao/hợp, rỗng và biên', () {
-    expect(jaccard({0, 1}, {0, 1}), 1);
-    expect(jaccard({0}, {1}), 0);
-    expect(jaccard({0, 1}, {1, 2}), closeTo(1 / 3, 1e-10));
-    expect(jaccard({}, {}), 0);
+  test('độ phủ giao/nhu cầu, rỗng và biên', () {
+    expect(scheduleCoverage({0, 1}, {0, 1}), 1);
+    expect(scheduleCoverage({0}, {1}), 0);
+    expect(scheduleCoverage({0, 1}, {1, 2}), .5);
+    expect(scheduleCoverage({}, {}), 0);
+  });
+  test('rảnh cả tuần không bị phạt so với rảnh đúng buổi cần', () {
+    final exact = rankTutors([candidate()], request, weights(), 4).single;
+    final week = rankTutors(
+      [candidate(slots: Set.from(List.generate(21, (i) => i)))],
+      request,
+      weights(),
+      4,
+    ).single;
+    expect(week.components['schedule'], 1);
+    expect(week.score, exact.score);
+    expect(week.reasons, contains('Trùng 2/2 buổi bạn cần'));
+    final partial = rankTutors(
+      [
+        candidate(slots: {0, 5, 8}),
+      ],
+      request,
+      weights(),
+      4,
+    ).single;
+    expect(partial.components['schedule'], .5);
+    expect(partial.reasons, contains('Trùng 1/2 buổi bạn cần'));
+  });
+  test('không chọn cấp thì điểm subject bằng 1', () {
+    final result = rankTutors(
+      [candidate(levels: {})],
+      const RankingRequest(
+        subject: 'math',
+        center: Position(0, 0),
+        radiusKm: 10,
+      ),
+      weights(),
+      4,
+    ).single;
+    expect(result.components['subject'], 1);
+    expect(result.reasons, isNot(contains('Khớp môn và cấp học mong muốn')));
+  });
+  test('bỏ hồ sơ lỗi và trả UID, giữ các hồ sơ hợp lệ ở hai chế độ', () {
+    final invalid = [
+      candidate(uid: 'negative', price: -1),
+      candidate(uid: 'nan', price: double.nan),
+      candidate(uid: 'infinity', price: double.infinity),
+      candidate(uid: 'slot-low', slots: {-1}),
+      candidate(uid: 'slot-high', slots: {21}),
+      candidate(uid: 'latitude', lat: 91),
+      candidate(uid: 'longitude', lon: -181),
+      candidate(uid: 'coordinate-nan', lat: double.nan),
+      candidate(uid: 'coordinate-infinity', lon: double.infinity),
+      candidate(uid: 'rating', average: double.nan),
+      candidate(uid: 'count', count: -1),
+    ];
+    for (final mode in RankingMode.values) {
+      final result = rankTutors(
+        [...invalid, candidate(uid: 'valid'), candidate(uid: 'far', lon: 1)],
+        request,
+        weights(),
+        4,
+        mode: mode,
+      );
+      expect(result.rankedTutors.single.tutor.uid, 'valid');
+      expect(result.skippedUids, invalid.map((t) => t.uid).toList());
+      expect(() => result.skippedUids.add('x'), throwsUnsupportedError);
+      expect(rankTutors(invalid, request, weights(), 4).rankedTutors, isEmpty);
+    }
+    expect(
+      () => rankTutors(
+        [],
+        const RankingRequest(
+          subject: 'math',
+          center: Position(91, 0),
+          radiusKm: 10,
+        ),
+        weights(),
+        4,
+      ),
+      throwsArgumentError,
+    );
   });
   test('giá đủ ngân sách, tuyến tính, giá gấp đôi và cao hơn', () {
     expect(priceScore(50, 100), 1);
@@ -232,7 +310,7 @@ void main() {
       ).single;
       expect(r.reasons, contains('Trùng 2/2 buổi bạn cần'));
       expect(r.reasons.any((s) => s.contains('(gần đúng)')), true);
-      expect(r.components['schedule'], closeTo(2 / 3, 1e-10));
+      expect(r.components['schedule'], 1);
     },
   );
 }

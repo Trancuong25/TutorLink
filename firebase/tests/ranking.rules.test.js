@@ -14,10 +14,18 @@ beforeEach(async()=>{
   }
  });
 });
-it('admin ghi, mọi user đăng nhập đọc, khách bị chặn',async()=>{
+it('admin ghi, user không khóa đọc, khách bị chặn',async()=>{
  await assertSucceeds(setDoc(doc(db('a'),'config/ranking_weights'),defaults));
  for(const uid of ['l','t','a'])await assertSucceeds(getDoc(doc(db(uid),'config/ranking_weights')));
  await assertFails(getDoc(doc(env.unauthenticatedContext().firestore(),'config/ranking_weights')));
+});
+it('chặn đọc config khi learner, tutor hoặc admin bị khóa hoặc chưa có user',async()=>{
+ await assertSucceeds(setDoc(doc(db('a'),'config/ranking_weights'),defaults));
+ for(const uid of ['l','t','a']) {
+  await env.withSecurityRulesDisabled(c=>updateDoc(doc(c.firestore(),'users',uid),{isLocked:true}));
+  await assertFails(getDoc(doc(db(uid),'config/ranking_weights')));
+ }
+ await assertFails(getDoc(doc(db('missing'),'config/ranking_weights')));
 });
 it('chặn learner/tutor và admin bị khóa ghi hoặc xóa',async()=>{
  for(const uid of ['l','t','locked'])await assertFails(setDoc(doc(db(uid),'config/ranking_weights'),defaults));

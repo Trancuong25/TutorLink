@@ -55,6 +55,11 @@ class RankedResults extends ConsumerWidget {
         selected.weights,
         selected.systemMean,
       );
+      if (ranked.skippedUids.isNotEmpty) {
+        debugPrint(
+          'Ranking bỏ qua hồ sơ không hợp lệ: ${ranked.skippedUids.join(", ")}',
+        );
+      }
       final byId = {for (final h in hits) h.tutor.uid: h};
       hits = ranked.map((r) => byId[r.tutor.uid]!).toList();
       explanations.addAll({for (final r in ranked) r.tutor.uid: r});

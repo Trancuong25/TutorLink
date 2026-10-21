@@ -19,12 +19,42 @@ beforeEach(async()=>{
   });
 });
 async function create(){await assertSucceeds(setDoc(doc(db('t'),'tutors/t'),profile()));}
-async function locate() {
+async function locate(longitude=106.6666) {
   const d=db('t'),batch=writeBatch(d);
-  batch.set(doc(d,'private_locations/t'),{location:new GeoPoint(10.9804,106.6666),source:'gps',consentVersion:'location-v1',updatedAt:serverTimestamp()});
+  batch.set(doc(d,'private_locations/t'),{location:new GeoPoint(10.9804,longitude),source:'gps',consentVersion:'location-v1',updatedAt:serverTimestamp()});
   batch.update(doc(d,'tutors/t'),{approxLocation:new GeoPoint(10.983,106.668),geohash:'w3gv4s',updatedAt:serverTimestamp()});
   return batch.commit();
 }
+it('chặn get/query tutors của mọi vai trò bị khóa, kể cả chủ sở hữu',async()=>{
+  await create();
+  for(const uid of ['l','t','a']) {
+    await assertSucceeds(getDoc(doc(db(uid),'tutors/t')));
+    await env.withSecurityRulesDisabled(c=>updateDoc(doc(c.firestore(),'users',uid),{isLocked:true}));
+    await assertFails(getDoc(doc(db(uid),'tutors/t')));
+    await assertFails(getDocs(query(collection(db(uid),'tutors'),where('isHidden','==',false))));
+  }
+  await assertFails(getDoc(doc(db('missing'),'tutors/t')));
+});
+it('kinh độ riêng chấp nhận hai biên; SDK từ chối tọa độ ngoài biên',async()=>{
+  await create();
+  for(const longitude of [-180,180]) await assertSucceeds(locate(longitude));
+  // GeoPoint từ chối trước khi gửi RPC; test biên trên Emulator kiểm tra Rules cho dữ liệu hợp lệ.
+  for(const longitude of [-180.001,180.001]) {
+    expect(()=>new GeoPoint(10.9804,longitude)).toThrow();
+  }
+});
+it('Emulator chặn kinh độ ngoài biên ngay cả khi bỏ qua validation SDK',async()=>{
+  await create();
+  for(const longitude of [-180.001,180.001]) {
+    const d=db('t'),batch=writeBatch(d),point=new GeoPoint(10.9804,0);
+    // Mô phỏng client sửa payload, không dựa vào validation của GeoPoint.
+    Object.defineProperty(point,'longitude',{value:longitude});
+    batch.set(doc(d,'private_locations/t'),{location:point,source:'gps',consentVersion:'location-v1',updatedAt:serverTimestamp()});
+    batch.update(doc(d,'tutors/t'),{approxLocation:new GeoPoint(10.983,106.668),geohash:'w3gv4s',updatedAt:serverTimestamp()});
+    // Firestore kiểm tra miền GeoPoint trước Rules, trả INVALID_ARGUMENT.
+    await expect(batch.commit()).rejects.toMatchObject({code:'invalid-argument'});
+  }
+});
 it('tutor tạo/sửa; learner không tạo; tutor khác không sửa',async()=>{
   await create();
   await assertSucceeds(updateDoc(doc(db('t'),'tutors/t'),{bio:'Mới',updatedAt:serverTimestamp()}));

@@ -1,5 +1,6 @@
 library;
 
+import 'dart:collection';
 import 'dart:math' as math;
 
 enum RankingMode { nearest, bestMatch }
@@ -110,9 +111,23 @@ class RankedTutor {
   final List<String> reasons;
 }
 
-double jaccard(Set<int> a, Set<int> b) {
-  final union = a.union(b);
-  return union.isEmpty ? 0 : a.intersection(b).length / union.length;
+class RankingResult extends IterableBase<RankedTutor> {
+  RankingResult(Iterable<RankedTutor> ranked, Iterable<String> skipped)
+    : rankedTutors = List.unmodifiable(ranked),
+      skippedUids = List.unmodifiable(skipped);
+
+  final List<RankedTutor> rankedTutors;
+  final List<String> skippedUids;
+
+  @override
+  Iterator<RankedTutor> get iterator => rankedTutors.iterator;
+}
+
+double scheduleCoverage(Set<int> available, Set<int> needed) {
+  // Độ phủ không phạt gia sư có thêm buổi rảnh ngoài nhu cầu.
+  return needed.isEmpty
+      ? 0
+      : available.intersection(needed).length / needed.length;
 }
 
 double priceScore(double price, double budget) {
@@ -134,7 +149,7 @@ double bayesianRating(double average, int count, double systemMean) {
   return ((count * average + 5 * systemMean) / (count + 5) / 5).clamp(0.0, 1.0);
 }
 
-List<RankedTutor> rankTutors(
+RankingResult rankTutors(
   Iterable<TutorCandidate> candidates,
   RankingRequest request,
   RankingWeights weights,
@@ -152,20 +167,31 @@ List<RankedTutor> rankTutors(
   bayesianRating(0, 0, systemMean);
   final effective = weights.effective(request);
   final ranked = <RankedTutor>[];
+  final skipped = <String>[];
   for (final tutor in candidates) {
+    // Một hồ sơ lỗi không làm hỏng toàn bộ kết quả tìm kiếm.
+    if (!tutor.position.valid ||
+        !tutor.hourlyRate.isFinite ||
+        tutor.hourlyRate < 0 ||
+        tutor.slots.any((s) => s < 0 || s > 20) ||
+        !tutor.ratingAvg.isFinite ||
+        tutor.ratingAvg < 0 ||
+        tutor.ratingAvg > 5 ||
+        tutor.ratingCount < 0) {
+      skipped.add(tutor.uid);
+      continue;
+    }
     if (!tutor.isAvailable || !tutor.subjects.contains(request.subject))
       continue;
     final distance = haversineKm(request.center, tutor.position);
     if (distance > request.radiusKm) continue;
-    if (!tutor.hourlyRate.isFinite ||
-        tutor.hourlyRate < 0 ||
-        tutor.slots.any((s) => s < 0 || s > 20))
-      throw ArgumentError('Gia sư không hợp lệ');
     final components = <String, double?>{
-      'subject': tutor.levels.contains(request.level) ? 1 : 0.5,
+      'subject': request.level == null || tutor.levels.contains(request.level)
+          ? 1
+          : 0.5,
       'schedule': request.slots.isEmpty
           ? null
-          : jaccard(tutor.slots, request.slots),
+          : scheduleCoverage(tutor.slots, request.slots),
       'distance': (1 - distance / request.radiusKm).clamp(0.0, 1.0),
       'price': request.budget == null
           ? null
@@ -208,5 +234,5 @@ List<RankedTutor> rankTutors(
     final d = a.distanceKm.compareTo(b.distanceKm);
     return d != 0 ? d : a.tutor.uid.compareTo(b.tutor.uid);
   });
-  return ranked;
+  return RankingResult(ranked, skipped);
 }
